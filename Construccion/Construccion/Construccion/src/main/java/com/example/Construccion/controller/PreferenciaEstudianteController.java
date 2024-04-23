@@ -1,7 +1,7 @@
-package com.example.Construccion.controller;
+package com.example.Construccion.Controller;
 
 import com.example.Construccion.entity.PreferenciaEstudiante;
-import com.example.Construccion.service.PreferenciaEstudianteService;
+import com.example.Construccion.Service.PreferenciaEstudianteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +25,9 @@ public class PreferenciaEstudianteController {
         preferenciaEstudianteService.insertPreferenciaEstudiante(
                 preferenciaEstudiante.getIdPreferencia(),
                 preferenciaEstudiante.getEstudiante().getIdEstudiante(),
-                preferenciaEstudiante.getTipoEspacio(),
                 preferenciaEstudiante.getPresupuestoMaximo(),
-                preferenciaEstudiante.getDistanciaMaxima(),
                 preferenciaEstudiante.isDeseaRoomie(),
+                preferenciaEstudiante.isDeseaLavanderia(),
                 preferenciaEstudiante.isNecesitaParqueaderoBicicleta()
         );
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -39,10 +38,9 @@ public class PreferenciaEstudianteController {
         preferenciaEstudianteService.updatePreferenciaEstudiante(
                 idPreferencia,
                 idEstudiante,
-                preferenciaEstudiante.getTipoEspacio(),
                 preferenciaEstudiante.getPresupuestoMaximo(),
-                preferenciaEstudiante.getDistanciaMaxima(),
                 preferenciaEstudiante.isDeseaRoomie(),
+                preferenciaEstudiante.isDeseaLavanderia(),
                 preferenciaEstudiante.isNecesitaParqueaderoBicicleta()
         );
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -70,3 +68,4 @@ public class PreferenciaEstudianteController {
         return new ResponseEntity<>(preferenciasEstudiantes, HttpStatus.OK);
     }
 }
+
