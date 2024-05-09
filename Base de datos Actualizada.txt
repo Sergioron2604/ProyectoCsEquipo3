@@ -1,0 +1,162 @@
+***Base de datos aplicación**
+
+
+CREATE TABLE Estado_Reserva (
+    id_estado_reserva INT PRIMARY KEY,
+    estado_reserva VARCHAR(50)
+);
+
+INSERT INTO Estado_Reserva (id_estado_reserva, estado_reserva) VALUES
+(1, 'Activa'),
+(2, 'Cancelada'),
+(3, 'Finalizada');
+
+CREATE TABLE Estado_Estudiante (
+    id_estado_estudiante INT PRIMARY KEY,
+    estado_estudiante VARCHAR(50)
+);
+
+INSERT INTO Estado_Estudiante (id_estado_estudiante, estado_estudiante) VALUES
+(1, 'Activo'),
+(2, 'Inactivo');
+
+CREATE TABLE Estado_Habitacion (
+    id_estado_habitacion INT PRIMARY KEY,
+    estado_habitacion VARCHAR(50)
+);
+
+INSERT INTO Estado_Habitacion (id_estado_habitacion, estado_habitacion) VALUES
+(1, 'Disponible'),
+(2, 'Reservada'),
+(3, 'No disponible');
+
+CREATE TABLE Estado_Propietario (
+    id_estado_propietario INT PRIMARY KEY,
+    estado_propietario VARCHAR(50)
+);
+
+INSERT INTO Estado_Propietario (id_estado_propietario, estado_propietario) VALUES
+(1, 'Activo'),
+(2, 'Inactivo');
+
+CREATE TABLE Universidad (
+    id_universidad INT PRIMARY KEY,
+    nombre_universidad VARCHAR(100),
+    direccion VARCHAR(255),
+    ciudad VARCHAR(50)
+);
+
+-- Insertamos la Universidad Católica de Colombia con un id específico (por ejemplo, 1)
+INSERT INTO Universidad (id_universidad, nombre_universidad, direccion, ciudad)
+VALUES (1, 'Universidad Católica de Colombia', 'Dirección de la universidad', 'Bogotá');
+
+CREATE TABLE Amenidades (
+    id_amenidad INT PRIMARY KEY,
+    nombre_amenidad VARCHAR(50)
+);
+
+CREATE TABLE Propietario (
+    id_propietario INT PRIMARY KEY,
+    nombre VARCHAR(50),
+    email VARCHAR(50),
+    telefono VARCHAR(15),
+    id_estado INT,
+    FOREIGN KEY (id_estado) REFERENCES Estado_Propietario(id_estado_propietario)
+);
+
+CREATE TABLE Estudiante (
+    id_estudiante INT PRIMARY KEY,
+    nombre VARCHAR(50),
+    edad INT,
+    email VARCHAR(50),
+    telefono VARCHAR(15),
+    id_universidad INT,
+    id_estado INT,
+    FOREIGN KEY (id_universidad) REFERENCES Universidad(id_universidad),
+    FOREIGN KEY (id_estado) REFERENCES Estado_Estudiante(id_estado_estudiante)
+);
+
+CREATE TABLE Habitacion (
+    id_habitacion INT PRIMARY KEY,
+    nombre_habitacion VARCHAR(50),
+    descripcion VARCHAR(255),
+    direccion VARCHAR(255),
+    ciudad VARCHAR(50),
+    precio DOUBLE,
+    id_propietario INT,
+    id_estado INT,
+    FOREIGN KEY (id_propietario) REFERENCES Propietario(id_propietario),
+    FOREIGN KEY (id_estado) REFERENCES Estado_Habitacion(id_estado_habitacion)
+);
+
+CREATE TABLE Habitacion_Amenidad (
+    id_habitacion INT,
+    id_amenidad INT,
+    FOREIGN KEY (id_habitacion) REFERENCES Habitacion(id_habitacion),
+    FOREIGN KEY (id_amenidad) REFERENCES Amenidades(id_amenidad),
+    PRIMARY KEY (id_habitacion, id_amenidad)
+);
+
+CREATE TABLE Comentario (
+    id_comentario INT PRIMARY KEY,
+    id_habitacion INT,
+    id_estudiante INT,
+    comentario TEXT,
+    FOREIGN KEY (id_habitacion) REFERENCES Habitacion(id_habitacion),
+    FOREIGN KEY (id_estudiante) REFERENCES Estudiante(id_estudiante)
+);
+
+CREATE TABLE Foto (
+    id_foto INT PRIMARY KEY,
+    id_habitacion INT,
+    url VARCHAR(255),
+    FOREIGN KEY (id_habitacion) REFERENCES Habitacion(id_habitacion)
+);
+
+CREATE TABLE Reserva (
+    id_reserva INT PRIMARY KEY,
+    id_estudiante INT,
+    id_habitacion INT,
+    fecha_inicio DATE,
+    fecha_fin DATE,
+    id_estado INT,
+    FOREIGN KEY (id_estudiante) REFERENCES Estudiante(id_estudiante),
+    FOREIGN KEY (id_habitacion) REFERENCES Habitacion(id_habitacion),
+    FOREIGN KEY (id_estado) REFERENCES Estado_Reserva(id_estado_reserva)
+);
+
+CREATE TABLE Estudiante_Reserva (
+    id_estudiante INT,
+    id_reserva INT,
+    PRIMARY KEY (id_estudiante, id_reserva),
+    FOREIGN KEY (id_estudiante) REFERENCES Estudiante(id_estudiante),
+    FOREIGN KEY (id_reserva) REFERENCES Reserva(id_reserva)
+);
+
+CREATE TABLE Preferencia_Estudiante (
+    id_preferencia INT PRIMARY KEY,
+    id_estudiante INT,
+    presupuesto_maximo DOUBLE,
+    desea_lavanderia BOOLEAN
+    desea_roomie BOOLEAN,
+    necesita_parqueadero_bicicleta BOOLEAN,
+    FOREIGN KEY (id_estudiante) REFERENCES Estudiante(id_estudiante)
+);
+
+CREATE TABLE Historial (
+    id_historial INT PRIMARY KEY,
+    id_entidad_afectada INT,
+    tipo_entidad VARCHAR(50),
+    id_estado_anterior INT,
+    id_estado_nuevo INT,
+    fecha_hora_cambio DATETIME,
+    FOREIGN KEY (id_estado_anterior) REFERENCES Estado_Habitacion(id_estado_habitacion),
+    FOREIGN KEY (id_estado_nuevo) REFERENCES Estado_Habitacion(id_estado_habitacion),  
+    FOREIGN KEY (id_estado_anterior) REFERENCES Estado_Reserva(id_estado_reserva),
+	FOREIGN KEY (id_estado_nuevo) REFERENCES Estado_Reserva(id_estado_reserva),
+	FOREIGN KEY (id_estado_anterior) REFERENCES Estado_Estudiante(id_estado_estudiante),
+	FOREIGN KEY (id_estado_nuevo) REFERENCES Estado_Estudiante(id_estado_estudiante),
+	FOREIGN KEY (id_estado_anterior) REFERENCES Estado_Propietario(id_estado_propietario),
+    FOREIGN KEY (id_estado_nuevo) REFERENCES Estado_Propietario(id_estado_propietario)
+);
+
