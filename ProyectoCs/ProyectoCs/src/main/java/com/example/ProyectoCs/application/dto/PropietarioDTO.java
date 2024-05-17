@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class PropietarioDTO {
-    private int idPropietario;
+    private Long idPropietario;
     private String nombre;
     private String email;
     private String telefono;

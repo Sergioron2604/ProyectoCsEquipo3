@@ -8,8 +8,9 @@ import jakarta.persistence.*;
 public class Propietario {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_propietario")
-    private int idPropietario;
+    private long idPropietario;
 
     @Column(name = "nombre")
     private String nombre;

@@ -1,9 +1,13 @@
 package com.example.ProyectoCs.application.usescase;
 
 import com.example.ProyectoCs.application.dto.EstudianteDTO;
+import com.example.ProyectoCs.domain.model.EstadoEstudiante;
 import com.example.ProyectoCs.domain.model.Estudiante;
+import com.example.ProyectoCs.domain.model.Universidad;
 import com.example.ProyectoCs.domain.repository.EstudianteRepository;
 import com.example.ProyectoCs.domain.repository.HistorialRepository;
+import com.example.ProyectoCs.domain.repository.UniversidadRepository;
+import com.example.ProyectoCs.domain.repository.EstadoEstudianteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +21,17 @@ public class EstudianteService {
 
     private final EstudianteRepository estudianteRepository;
     private final NotificationService notificationService;
-    private final HistorialRepository historialRepository;
+    private final EstadoEstudianteRepository estadoEstudianteRepository;
+    private final UniversidadRepository universidadRepository;
+
+
 
     @Autowired
-    public EstudianteService(EstudianteRepository estudianteRepository, NotificationService notificationService, HistorialRepository historialRepository) {
+    public EstudianteService(EstudianteRepository estudianteRepository, NotificationService notificationService,UniversidadRepository universidadRepository, EstadoEstudianteRepository estadoEstudianteRepository ) {
         this.estudianteRepository = estudianteRepository;
         this.notificationService = notificationService;
-        this.historialRepository = historialRepository;
+        this.universidadRepository = universidadRepository;
+        this.estadoEstudianteRepository=estadoEstudianteRepository;
     }
 
     public void registrarEstudiante(EstudianteDTO estudianteDTO) throws MessagingException, jakarta.mail.MessagingException {
@@ -33,8 +41,17 @@ public class EstudianteService {
         }
 
 
+        EstadoEstudiante estadoEstudiante = estadoEstudianteRepository.findById(1)
+                .orElseThrow(() -> new IllegalStateException("Estado de estudiante no encontrado"));
+
+        Universidad universidad = universidadRepository.findById(1)
+                .orElseThrow(() -> new IllegalStateException("Universidad no encontrada"));
+
 
         Estudiante estudiante = convertirDTOaEntidad(estudianteDTO);
+
+        estudiante.setEstadoEstudiante(estadoEstudiante);
+        estudiante.setUniversidad(universidad);
         estudianteRepository.save(estudiante);
         notificationService.sendNotification(estudianteDTO);
     }

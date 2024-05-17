@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EstadoEstudianteRepository extends JpaRepository<EstadoEstudiante, Integer> {
-    // Puedes agregar métodos personalizados de consulta si es necesario
 }
