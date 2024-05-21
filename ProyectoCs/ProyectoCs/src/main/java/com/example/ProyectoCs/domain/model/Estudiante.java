@@ -1,7 +1,11 @@
 package com.example.ProyectoCs.domain.model;
 import lombok.Data;
 import jakarta.persistence.*;
+import org.antlr.v4.runtime.misc.NotNull;
+
 import java.util.UUID;
+
+
 @Data
 @Entity
 @Table(name = "Estudiante")
@@ -12,16 +16,20 @@ public class Estudiante {
     @Column(columnDefinition = "BINARY(16)")
     private UUID idEstudiante;
 
-    @Column(name = "nombre")
+    @NotNull
+    @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    @Column(name = "edad")
+    @NotNull
+    @Column(name = "edad", nullable = false)
     private int edad;
 
-    @Column(name = "email")
+    @NotNull
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "telefono")
+    @NotNull
+    @Column(name = "telefono", nullable = false)
     private String telefono;
 
     @ManyToOne
@@ -31,5 +39,4 @@ public class Estudiante {
     @ManyToOne
     @JoinColumn(name = "id_estado")
     private EstadoEstudiante estadoEstudiante;
-
 }

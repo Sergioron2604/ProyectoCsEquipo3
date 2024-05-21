@@ -1,9 +1,11 @@
 package com.example.ProyectoCs.presentation;
 
+import com.example.ProyectoCs.application.dto.AlojamientoDTO;
 import com.example.ProyectoCs.application.dto.EstudianteDTO;
 import com.example.ProyectoCs.application.dto.PropietarioDTO;
 import com.example.ProyectoCs.application.usescase.EstudianteService;
 import com.example.ProyectoCs.application.usescase.PropietarioService;
+import com.example.ProyectoCs.application.usescase.AlojamientoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +22,8 @@ public class NotificationController {
     @Autowired
     private EstudianteService estudianteService;
     private final PropietarioService propietarioService;
-
+    private NotificationController notificationController;
+    private final AlojamientoService alojamientoService;
 
 
     @PostMapping("registrar/usuario")
@@ -77,6 +80,18 @@ public class NotificationController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar el propietario.");
         }
 }
+
+    @PostMapping("/crear/alojamiento")
+    public ResponseEntity<String> crearAlojamiento(@RequestBody AlojamientoDTO alojamientoDTO) {
+        try {
+            alojamientoService.crearNuevaHabitacion(alojamientoDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body("La habitación se ha creado exitosamente.");
+        } catch (MessagingException | jakarta.mail.MessagingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la habitación: " + e.getMessage());
+        }
+    }
+
+
 }
 
 

@@ -65,4 +65,15 @@ public class NotificationService {
         message.setText("Hola " + propietarioDTO.getNombre() + ",\n\nAgradecemos por confiar en nosotros, lamentablemente hasta aquí hemos llegado tu usuario a sido revocado.\n Gracias por compartir este tiempo con nosotros" +
                 "\n\nSaludos,\nEquipo 3 Construcción de Software , \n\n Allison, Felipe, Sergio");
     }
+
+    public void sendNotificationNew(Estudiante estudianteDTO, String mensaje) throws jakarta.mail.MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+        helper.setTo(estudianteDTO.getEmail());
+        helper.setSubject("Nueva Habitación Disponible");
+        helper.setText("Hola " + estudianteDTO.getNombre() + ",\n\n Te queremos informar sobre una habitación disponible mira en la aplación para saber si te interesa"+
+                "\nAtentamente\n"+
+                "Grupo 3 Construcción de software");
+        mailSender.send(mimeMessage);
+    }
 }
