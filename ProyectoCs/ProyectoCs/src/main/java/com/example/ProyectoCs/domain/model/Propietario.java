@@ -8,7 +8,6 @@ import jakarta.persistence.*;
 public class Propietario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_propietario")
     private long idPropietario;
 
@@ -18,6 +17,8 @@ public class Propietario {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "contraseña")
+    private String contraseña;
     @Column(name = "telefono")
     private String telefono;
 

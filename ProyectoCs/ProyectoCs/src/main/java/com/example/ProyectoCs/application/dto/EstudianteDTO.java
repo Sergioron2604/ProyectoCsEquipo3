@@ -9,6 +9,7 @@ public class EstudianteDTO {
     private String nombre;
     private int edad;
     private String email;
+    private String contraseña;
     private String telefono;
     private int idUniversidad;
     private int idEstadoEstudiante;

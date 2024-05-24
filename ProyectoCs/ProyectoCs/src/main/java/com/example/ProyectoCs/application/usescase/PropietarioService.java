@@ -6,6 +6,7 @@ import com.example.ProyectoCs.domain.model.Propietario;
 import com.example.ProyectoCs.domain.repository.EstadoPropietarioRepository;
 import com.example.ProyectoCs.domain.repository.PropietarioRepository;
 import com.example.ProyectoCs.application.usescase.NotificationService;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +34,11 @@ public class PropietarioService {
         if (propietarioExistente.isPresent()) {
             throw new IllegalStateException("El propietario ya está registrado");
         }
-        Propietario propietario = convertirDTOaEntidad(propietarioDTO);
+        if (!esContrasenaValida(propietarioDTO.getContraseña())) {
+            throw new IllegalArgumentException("La contraseña no cumple con los requisitos de seguridad");
+        }
 
+        Propietario propietario = convertirDTOaEntidad(propietarioDTO);
         EstadoPropietario estadoPropietario = estadoPropietarioRepository.findById(3)
                 .orElseThrow(() -> new IllegalStateException("Estado de propietario no encontrado"));
         propietario.setEstadoPropietario(estadoPropietario);
@@ -43,8 +47,33 @@ public class PropietarioService {
             propietario.setIdPropietario(Math.toIntExact(propietarioDTO.getIdPropietario()));
         }
 
+        String contraseñaCifrada = BCrypt.hashpw(propietarioDTO.getContraseña(), BCrypt.gensalt());
+
+        propietario.setContraseña(contraseñaCifrada);
         propietarioRepository.save(propietario);
         notificationService.sendNotification(propietarioDTO);
+    }
+
+    private boolean esContrasenaValida(String contraseña) {
+        if (contraseña == null) {
+            return false;
+        }
+        if (contraseña.length() < 8) {
+            return false;
+        }
+        if (!contraseña.matches(".*\\d.*")) {
+            return false;
+        }
+        if (!contraseña.matches(".*[a-z].*")) {
+            return false;
+        }
+        if (!contraseña.matches(".*[A-Z].*")) {
+            return false;
+        }
+        if (!contraseña.matches(".*[!@#$%^&*()].*")) {
+            return false;
+        }
+        return true;
     }
 
     public void eliminarPropietario(String email) throws MessagingException {
@@ -58,17 +87,21 @@ public class PropietarioService {
 
     private Propietario convertirDTOaEntidad(PropietarioDTO propietarioDTO) {
         Propietario propietario = new Propietario();
+        propietario.setIdPropietario(propietarioDTO.getIdPropietario());
         propietario.setNombre(propietarioDTO.getNombre());
         propietario.setEmail(propietarioDTO.getEmail());
         propietario.setTelefono(propietarioDTO.getTelefono());
+        propietario.setContraseña(propietarioDTO.getContraseña());
         return propietario;
     }
 
     private PropietarioDTO convertirEntidadADTO(Propietario propietario) {
         PropietarioDTO propietarioDTO = new PropietarioDTO();
+        propietarioDTO.setIdPropietario(propietario.getIdPropietario());
         propietarioDTO.setNombre(propietario.getNombre());
         propietarioDTO.setEmail(propietario.getEmail());
         propietarioDTO.setTelefono(propietario.getTelefono());
+        propietarioDTO.setContraseña(propietario.getContraseña());
         return propietarioDTO;
     }
 }

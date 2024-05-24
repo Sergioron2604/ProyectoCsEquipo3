@@ -9,6 +9,7 @@ import java.util.Date;
 public class Reserva {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_reserva")
     private int idReserva;
 

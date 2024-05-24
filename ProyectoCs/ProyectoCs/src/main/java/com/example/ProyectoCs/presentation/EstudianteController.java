@@ -15,14 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import javax.mail.MessagingException;
 
 @RestController
-@RequestMapping("/api/v1/notification")
+@RequestMapping("/api/v1/estudiantes")
 @RequiredArgsConstructor
-public class NotificationController {
+public class EstudianteController {
 
     @Autowired
     private EstudianteService estudianteService;
     private final PropietarioService propietarioService;
-    private NotificationController notificationController;
     private final AlojamientoService alojamientoService;
 
 
@@ -54,44 +53,6 @@ public class NotificationController {
         }
 
     }
-
-    @PostMapping("registrar/propietario")
-    public ResponseEntity<String> registrarPropietario(@RequestBody PropietarioDTO propietarioDTO) {
-        try {
-            propietarioService.registrarPropietario(propietarioDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Propietario registrado exitosamente");
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (MessagingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al enviar el correo de bienvenida");
-        }
-    }
-
-    @DeleteMapping("/propietarios/{email}")
-    public ResponseEntity<String> eliminarPropietario(@PathVariable String email) {
-        try {
-            propietarioService.eliminarPropietario(email);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Propietario eliminado y correo de eliminicación enviado.");
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (MessagingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al enviar el correo de eliminación.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar el propietario.");
-        }
-}
-
-    @PostMapping("/crear/alojamiento")
-    public ResponseEntity<String> crearAlojamiento(@RequestBody AlojamientoDTO alojamientoDTO) {
-        try {
-            alojamientoService.crearNuevaHabitacion(alojamientoDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body("La habitación se ha creado exitosamente.");
-        } catch (MessagingException | jakarta.mail.MessagingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la habitación: " + e.getMessage());
-        }
-    }
-
-
 }
 
 

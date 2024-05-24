@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,29 +44,49 @@ public class AlojamientoService {
     }
 
     private AlojamientoDTO convertirEntidadADTO(Alojamiento alojamiento) {
-        AlojamientoDTO dto = new AlojamientoDTO();
-        dto.setIdAlojamiento(alojamiento.getIdAlojamiento());
-        dto.setNombreAlojamiento(alojamiento.getNombreAlojamiento());
-        dto.setDescripcion(alojamiento.getDescripcion());
-        dto.setDireccion(alojamiento.getDireccion());
-        dto.setCiudad(alojamiento.getCiudad());
-        dto.setPrecio(alojamiento.getPrecio());
-        dto.setTieneLavanderia(alojamiento.isTieneLavanderia());
-        dto.setTieneRoomie(alojamiento.isTieneRoomie());
-        dto.setTieneParqueaderoBicicleta(alojamiento.isTieneParqueaderoBicicleta());
-        return dto;
+        return new AlojamientoDTO(
+                alojamiento.getIdAlojamiento(),
+                alojamiento.getNombreAlojamiento(),
+                alojamiento.getDescripcion(),
+                alojamiento.getDireccion(),
+                alojamiento.getCiudad(),
+                alojamiento.getPrecio(),
+                (int) alojamiento.getPropietario().getIdPropietario(),
+                alojamiento.getEstadoHabitacion().getIdEstadoHabitacion(),
+                alojamiento.getTipoAlojamiento().getTipoAlojamientoID(),
+                alojamiento.isTieneLavanderia(),
+                alojamiento.isTieneRoomie(),
+                alojamiento.isTieneParqueaderoBicicleta()
+        );
     }
 
     public void crearNuevaHabitacion(AlojamientoDTO alojamientoDTO) throws MessagingException, jakarta.mail.MessagingException {
         Alojamiento alojamiento = convertirDTOaEntidad(alojamientoDTO);
+        alojamiento.getEstadoHabitacion().setIdEstadoHabitacion(1);
         Alojamiento nuevaHabitacion = alojamientoRepository.save(alojamiento);
-
         List<Estudiante> estudiantes = obtenerTodosLosEstudiantes();
         String mensaje = "¡Hola estudiantes! Se ha creado una nueva habitación en nuestra plataforma.";
         for (Estudiante estudiante : estudiantes) {
             notificationService.sendNotificationNew(estudiante, mensaje);
         }
     }
+
+    public Map<String, Object> compararAlojamientos(int idAlojamiento1, int idAlojamiento2) {
+        Alojamiento alojamiento1 = alojamientoRepository.findById(idAlojamiento1)
+                .orElseThrow(() -> new IllegalArgumentException("Alojamiento 1 no encontrado"));
+        Alojamiento alojamiento2 = alojamientoRepository.findById(idAlojamiento2)
+                .orElseThrow(() -> new IllegalArgumentException("Alojamiento 2 no encontrado"));
+
+        AlojamientoDTO alojamientoDTO1 = convertirEntidadADTO(alojamiento1);
+        AlojamientoDTO alojamientoDTO2 = convertirEntidadADTO(alojamiento2);
+
+        Map<String, Object> comparacion = new HashMap<>();
+        comparacion.put("Alojamiento 1", alojamientoDTO1);
+        comparacion.put("Alojamiento 2", alojamientoDTO2);
+
+        return comparacion;
+    }
+
     private List<Estudiante> obtenerTodosLosEstudiantes() {
         return estudianteRepository.findAll();
     }

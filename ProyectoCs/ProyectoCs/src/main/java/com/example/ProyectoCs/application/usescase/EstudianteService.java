@@ -8,6 +8,7 @@ import com.example.ProyectoCs.domain.repository.EstudianteRepository;
 import com.example.ProyectoCs.domain.repository.HistorialRepository;
 import com.example.ProyectoCs.domain.repository.UniversidadRepository;
 import com.example.ProyectoCs.domain.repository.EstadoEstudianteRepository;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +41,9 @@ public class EstudianteService {
             throw new IllegalStateException("El estudiante ya está registrado");
         }
 
+        if (!esContrasenaValida(estudianteDTO.getContraseña())) {
+            throw new IllegalArgumentException("La contraseña no cumple con los requisitos de seguridad");
+        }
 
         EstadoEstudiante estadoEstudiante = estadoEstudianteRepository.findById(1)
                 .orElseThrow(() -> new IllegalStateException("Estado de estudiante no encontrado"));
@@ -47,13 +51,36 @@ public class EstudianteService {
         Universidad universidad = universidadRepository.findById(1)
                 .orElseThrow(() -> new IllegalStateException("Universidad no encontrada"));
 
+        String contraseñaCifrada = BCrypt.hashpw(estudianteDTO.getContraseña(), BCrypt.gensalt());
 
         Estudiante estudiante = convertirDTOaEntidad(estudianteDTO);
-
+        estudiante.setContraseña(contraseñaCifrada);
         estudiante.setEstadoEstudiante(estadoEstudiante);
         estudiante.setUniversidad(universidad);
         estudianteRepository.save(estudiante);
         notificationService.sendNotification(estudianteDTO);
+    }
+
+    private boolean esContrasenaValida(String contraseña) {
+        if (contraseña == null) {
+            return false;
+        }
+        if (contraseña.length() < 8) {
+            return false;
+        }
+        if (!contraseña.matches(".*\\d.*")) {
+            return false;
+        }
+        if (!contraseña.matches(".*[a-z].*")) {
+            return false;
+        }
+        if (!contraseña.matches(".*[A-Z].*")) {
+            return false;
+        }
+        if (!contraseña.matches(".*[!@#$%^&*()].*")) {
+            return false;
+        }
+        return true;
     }
 
     public void eliminarEstudiante(String email) throws MessagingException, jakarta.mail.MessagingException {

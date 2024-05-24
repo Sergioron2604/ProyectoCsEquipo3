@@ -10,19 +10,20 @@ import jakarta.persistence.*;
 public class Alojamiento {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_alojamiento")
     private int idAlojamiento;
 
-    @Column(name = "nombre_alojamiento", length = 50)
+    @Column(name = "nombre_alojamiento")
     private String nombreAlojamiento;
 
-    @Column(name = "descripcion", length = 255)
+    @Column(name = "descripcion")
     private String descripcion;
 
-    @Column(name = "direccion", length = 255)
+    @Column(name = "direccion")
     private String direccion;
 
-    @Column(name = "ciudad", length = 50)
+    @Column(name = "ciudad")
     private String ciudad;
 
     @Column(name = "precio")
