@@ -1,12 +1,9 @@
 package com.example.ProyectoCs.presentation;
 
-import com.example.ProyectoCs.application.dto.AlojamientoDTO;
 import com.example.ProyectoCs.application.dto.EstudianteDTO;
-import com.example.ProyectoCs.application.dto.PropietarioDTO;
-import com.example.ProyectoCs.application.usescase.EstudianteService;
-import com.example.ProyectoCs.application.usescase.PropietarioService;
-import com.example.ProyectoCs.application.usescase.AlojamientoService;
-import lombok.RequiredArgsConstructor;
+import com.example.ProyectoCs.application.usecase.ReservaUseCase;
+import com.example.ProyectoCs.application.dto.ReservaDTO;
+import com.example.ProyectoCs.infrastructure.gateway.EstudianteGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,44 +12,52 @@ import org.springframework.web.bind.annotation.*;
 import javax.mail.MessagingException;
 
 @RestController
-@RequestMapping("/api/v1/estudiantes")
-@RequiredArgsConstructor
+@RequestMapping("api/v1/estudiantes")
 public class EstudianteController {
 
+    private final EstudianteGateway estudianteGateway;
+    private final ReservaUseCase reservaUseCase;
+
     @Autowired
-    private EstudianteService estudianteService;
-    private final PropietarioService propietarioService;
-    private final AlojamientoService alojamientoService;
+    public EstudianteController(EstudianteGateway estudianteGateway ,ReservaUseCase reservaUseCase) {
+        this.estudianteGateway = estudianteGateway;
+        this.reservaUseCase = reservaUseCase;
+    }
 
-
-    @PostMapping("registrar/usuario")
+    @PostMapping("/registrar")
     public ResponseEntity<String> registrarEstudiante(@RequestBody EstudianteDTO estudianteDTO) {
         try {
-            estudianteService.registrarEstudiante(estudianteDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Estudiante registrado y correo de bienvenida enviado.");
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (MessagingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al enviar el correo de bienvenida.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al registrar el estudiante.");
+            estudianteGateway.registrarEstudiante(estudianteDTO);
+            return new ResponseEntity<>("Estudiante registrado exitosamente", HttpStatus.CREATED);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (MessagingException | jakarta.mail.MessagingException e) {
+            return new ResponseEntity<>("Error al enviar la notificación", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/estudiante/{email}")
-    public ResponseEntity<?> eliminarEstudiante(@PathVariable String email) throws MessagingException, jakarta.mail.MessagingException {
+    @DeleteMapping("/eliminar/{email}")
+    public ResponseEntity<String> eliminarEstudiante(@PathVariable String email) {
         try {
-            estudianteService.eliminarEstudiante(email);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Estudiante eliminado y correo de eliminación enviado.");
+            estudianteGateway.eliminarEstudiante(email);
+            return new ResponseEntity<>("Estudiante eliminado exitosamente", HttpStatus.OK);
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (MessagingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al enviar el correo de eliminación.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar el estudiante.");
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (MessagingException | jakarta.mail.MessagingException e) {
+            return new ResponseEntity<>("Error al enviar la notificación", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
 
+    @PostMapping("/crear/reserva")
+    public ResponseEntity<String> createReserva(@RequestBody ReservaDTO reservaDTO) throws MessagingException, jakarta.mail.MessagingException {
+        reservaUseCase.saveReserva(reservaDTO);
+        return ResponseEntity.ok("Reserva creada exitosamente");
+    }
+
+
+    @DeleteMapping("/{idReserva}")
+    public ResponseEntity<String> cancelarReserva(@PathVariable int idReserva) {
+        String resultado = reservaUseCase.cancelarReserva(idReserva);
+        return ResponseEntity.ok(resultado);
     }
 }
-
-

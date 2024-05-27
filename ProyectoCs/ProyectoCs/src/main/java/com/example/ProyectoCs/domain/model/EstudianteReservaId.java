@@ -1,7 +1,10 @@
 package com.example.ProyectoCs.domain.model;
-import java.io.Serializable;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 @Embeddable

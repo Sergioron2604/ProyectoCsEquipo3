@@ -1,6 +1,8 @@
 package com.example.ProyectoCs.domain.model;
+
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Data

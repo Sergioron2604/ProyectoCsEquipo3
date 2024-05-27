@@ -2,8 +2,6 @@ package com.example.ProyectoCs.application.dto;
 
 import lombok.Data;
 
-import lombok.Data;
-
 @Data
 public class AlojamientoDTO {
     private int idAlojamiento;
@@ -19,18 +17,6 @@ public class AlojamientoDTO {
     private boolean tieneRoomie;
     private boolean tieneParqueaderoBicicleta;
 
-    public AlojamientoDTO(int idAlojamiento, String nombreAlojamiento, String descripcion, String direccion, String ciudad, double precio, int idPropietario, int idEstadoHabitacion, int tipoAlojamientoId, boolean tieneLavanderia, boolean tieneRoomie, boolean tieneParqueaderoBicicleta) {
-        this.idAlojamiento = idAlojamiento;
-        this.nombreAlojamiento = nombreAlojamiento;
-        this.descripcion = descripcion;
-        this.direccion = direccion;
-        this.ciudad = ciudad;
-        this.precio = precio;
-        this.idPropietario = idPropietario;
-        this.idEstadoHabitacion = idEstadoHabitacion;
-        this.tipoAlojamientoId = tipoAlojamientoId;
-        this.tieneLavanderia = tieneLavanderia;
-        this.tieneRoomie = tieneRoomie;
-        this.tieneParqueaderoBicicleta = tieneParqueaderoBicicleta;
+    public AlojamientoDTO(int idAlojamiento, String nombreAlojamiento, String descripcion, String direccion, String ciudad, double precio, int idPropietario, int idEstadoHabitacion, int tipoAlojamientoID, boolean tieneLavanderia, boolean tieneRoomie, boolean tieneParqueaderoBicicleta) {
     }
 }
