@@ -1,7 +1,12 @@
 package com.example.ProyectoCs.application.usecase;
 
+import com.example.ProyectoCs.application.dto.EstudianteDTO;
 import com.example.ProyectoCs.application.dto.PropietarioDTO;
 import com.example.ProyectoCs.application.service.NotificationService;
+import com.example.ProyectoCs.domain.model.EstadoEstudiante;
+import com.example.ProyectoCs.domain.model.EstadoPropietario;
+import com.example.ProyectoCs.domain.model.Estudiante;
+import com.example.ProyectoCs.domain.repository.EstadoPropietarioRepository;
 import com.example.ProyectoCs.domain.repository.PropietarioRepository;
 import com.example.ProyectoCs.infrastructure.gateway.PropietarioGateway;
 import com.example.ProyectoCs.domain.model.Propietario;
@@ -17,12 +22,14 @@ public class PropietarioUseCase {
     private final PropietarioGateway propietarioGateway;
     private final NotificationService notificationService;
     private final PropietarioRepository propietarioRepository;
+    private final EstadoPropietarioRepository estadoPropietarioRepository;
 
     @Autowired
-    public PropietarioUseCase(PropietarioGateway propietarioGateway, NotificationService notificationService, PropietarioRepository propietarioRepository) {
+    public PropietarioUseCase(PropietarioGateway propietarioGateway, NotificationService notificationService, PropietarioRepository propietarioRepository, EstadoPropietarioRepository estadoPropietarioRepository) {
         this.propietarioGateway = propietarioGateway;
         this.notificationService = notificationService;
         this.propietarioRepository = propietarioRepository;
+        this.estadoPropietarioRepository = estadoPropietarioRepository;
     }
 
     public void registrarPropietario(PropietarioDTO propietarioDTO) throws MessagingException, jakarta.mail.MessagingException {
@@ -48,12 +55,17 @@ public class PropietarioUseCase {
         notificationService.sendWelcomeNotification(propietarioDTO);
     }
 
-    public void eliminarPropietario(String email) throws MessagingException, jakarta.mail.MessagingException {
-        Optional<Propietario> propietarioOptional = propietarioRepository.findByEmail(email);
-        Propietario propietario = propietarioOptional.orElseThrow(() -> new IllegalStateException("El propietario no está registrado"));
-        propietarioRepository.delete(propietario);
+    public void eliminarPropietario(Long Id) throws MessagingException, jakarta.mail.MessagingException {
+        Propietario propietario = propietarioRepository.findById(Id).get();
+        if (propietario == null) {
+            throw new IllegalStateException("El estudiante no está registrado");
+        }
+        EstadoPropietario estadoInactivo = estadoPropietarioRepository.findById(2L)
+                .orElseThrow(() -> new IllegalStateException("Estado de estudiante no encontrado"));
+        propietario.setEstadoPropietario(estadoInactivo);
+        propietarioRepository.save(propietario);
         PropietarioDTO propietarioDTO = convertirEntidadADTO(propietario);
-        notificationService.sendWelcomeNotification(propietarioDTO);
+        notificationService.sendFarewellNotification(propietarioDTO);
     }
 
     private boolean esContrasenaValida(String contraseña) {

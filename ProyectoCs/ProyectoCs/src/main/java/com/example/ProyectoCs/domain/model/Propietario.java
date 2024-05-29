@@ -9,8 +9,8 @@ import lombok.Data;
 public class Propietario {
 
     @Id
-    @Column(name = "id_propietario")
-    private long idPropietario;
+    @Column(name = "id_propietario", nullable = false, columnDefinition = "BIGINT")
+    private Long idPropietario;
 
     @Column(name = "nombre")
     private String nombre;
@@ -27,4 +27,7 @@ public class Propietario {
     @JoinColumn(name = "id_estado")
     private EstadoPropietario estadoPropietario;
 
+    public boolean isActivo() {
+        return true;
+    }
 }

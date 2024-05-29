@@ -32,4 +32,6 @@ public class Reserva {
     @ManyToOne
     @JoinColumn(name = "id_estado")
     private EstadoReserva estadoReserva;
+
+    private String correoEstudiante;
 }

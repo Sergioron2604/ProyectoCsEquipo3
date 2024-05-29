@@ -4,9 +4,12 @@ import com.example.ProyectoCs.application.dto.AlojamientoDTO;
 import com.example.ProyectoCs.application.dto.PreferenciaEstudianteDTO;
 import com.example.ProyectoCs.application.service.NotificationService;
 import com.example.ProyectoCs.domain.model.Alojamiento;
+import com.example.ProyectoCs.domain.model.EstadoHabitacion;
 import com.example.ProyectoCs.domain.model.Estudiante;
+import com.example.ProyectoCs.domain.model.Propietario;
 import com.example.ProyectoCs.domain.repository.AlojamientoRepository;
 import com.example.ProyectoCs.domain.repository.EstudianteRepository;
+import com.example.ProyectoCs.domain.repository.PropietarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +17,7 @@ import javax.mail.MessagingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -22,14 +26,17 @@ public class AlojamientoGatewayImpl implements AlojamientoGateway {
     private final AlojamientoRepository alojamientoRepository;
     private final EstudianteRepository estudianteRepository;
     private final NotificationService notificationService;
+    private final PropietarioRepository propietarioRepository;
 
     @Autowired
     public AlojamientoGatewayImpl(AlojamientoRepository alojamientoRepository,
                                   EstudianteRepository estudianteRepository,
-                                  NotificationService notificationService) {
+                                  NotificationService notificationService , PropietarioRepository propietarioRepository) {
         this.alojamientoRepository = alojamientoRepository;
         this.estudianteRepository = estudianteRepository;
         this.notificationService = notificationService;
+        this.propietarioRepository=propietarioRepository;
+
     }
 
     @Override
@@ -47,15 +54,25 @@ public class AlojamientoGatewayImpl implements AlojamientoGateway {
 
     @Override
     public void crearNuevaHabitacion(AlojamientoDTO alojamientoDTO) throws MessagingException, jakarta.mail.MessagingException {
+        if (!propietarioExiste(alojamientoDTO.getIdPropietario())) {
+            throw new IllegalArgumentException("El propietario con ID " + alojamientoDTO.getIdPropietario() + " no existe.");
+        }
         Alojamiento alojamiento = convertirDTOaEntidad(alojamientoDTO);
+
+        if (alojamiento.getEstadoHabitacion() == null) {
+            alojamiento.setEstadoHabitacion(new EstadoHabitacion());
+        }
         alojamiento.getEstadoHabitacion().setIdEstadoHabitacion(1);
         Alojamiento nuevaHabitacion = alojamientoRepository.save(alojamiento);
+
         List<Estudiante> estudiantes = obtenerTodosLosEstudiantes();
-        String mensaje = "¡Hola estudiantes! Se ha creado una nueva habitación en nuestra plataforma.";
-        for (Estudiante estudiante : estudiantes) {
-            //;
-        }
     }
+
+    private boolean propietarioExiste(long idPropietario) {
+        Optional<Propietario> propietarioOptional = propietarioRepository.findById(idPropietario);
+        return ((Optional<?>) propietarioOptional).isPresent();
+    }
+
 
     @Override
     public Map<String, Object> compararAlojamientos(int idAlojamiento1, int idAlojamiento2) {
@@ -98,7 +115,7 @@ public class AlojamientoGatewayImpl implements AlojamientoGateway {
                 alojamiento.getDireccion(),
                 alojamiento.getCiudad(),
                 alojamiento.getPrecio(),
-                (int) alojamiento.getPropietario().getIdPropietario(),
+                Math.toIntExact((Long) alojamiento.getPropietario().getIdPropietario()),
                 alojamiento.getEstadoHabitacion().getIdEstadoHabitacion(),
                 alojamiento.getTipoAlojamiento().getTipoAlojamientoID(),
                 alojamiento.isTieneLavanderia(),

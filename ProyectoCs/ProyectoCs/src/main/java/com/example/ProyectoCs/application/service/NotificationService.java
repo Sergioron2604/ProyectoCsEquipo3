@@ -2,8 +2,11 @@ package com.example.ProyectoCs.application.service;
 
 import com.example.ProyectoCs.application.dto.EstudianteDTO;
 import com.example.ProyectoCs.application.dto.PropietarioDTO;
+import com.example.ProyectoCs.application.dto.ReservaDTO;
 import com.example.ProyectoCs.infrastructure.gateway.EmailSenderGateway;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -51,5 +54,12 @@ public class NotificationService {
         String subject = "Nueva Habitación Disponible";
         String text = "Hola " + estudianteDTO.getNombre() + ",\n\nTe queremos informar sobre una habitación disponible. Mira en la aplicación para saber si te interesa.\n\nAtentamente\nGrupo 3 Construcción de software";
         emailSenderGateway.sendEmail(estudianteDTO.getEmail(), subject, text);
+    }
+
+
+    public void sendNewReserve(ReservaDTO reservaDTO) throws MessagingException, jakarta.mail.MessagingException {
+        String subject = "Agendamiento de reserva ";
+        String text = "Hola " + reservaDTO.getEmailEstudiante() + ",\n\nTe queremos informar sobre la reserva que acabas de realizar  .\n\nAtentamente\nGrupo 3 Construcción de software";
+        emailSenderGateway.sendEmail(reservaDTO.getEmailEstudiante(), subject, text);
     }
 }

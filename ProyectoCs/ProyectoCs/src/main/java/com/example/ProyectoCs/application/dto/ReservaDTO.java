@@ -7,7 +7,7 @@ import java.util.Date;
 @Data
 public class ReservaDTO {
     private int idReserva;
-    private int idEstudiante;
+    private String emailEstudiante;
     private int idAlojamiento;
     private Date fechaInicio;
     private Date fechaFin;

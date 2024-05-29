@@ -49,4 +49,16 @@ public class Alojamiento {
     @Column(name = "TieneParqueaderoBicicleta")
     private boolean tieneParqueaderoBicicleta;
 
+
+    public void cambiarEstado() {
+        // Lógica para cambiar el estado del alojamiento
+        // Por ejemplo, si el estado actual es ocupado (id = 1), cambia a disponible (id = 2)
+        if (this.estadoHabitacion.getIdEstadoHabitacion() == 1) {
+            // Cambiar a estado disponible (id = 2)
+            EstadoHabitacion nuevoEstado = new EstadoHabitacion();
+            nuevoEstado.setIdEstadoHabitacion(2);
+            this.estadoHabitacion = nuevoEstado;
+        } else {
+        }
+    }
 }

@@ -37,4 +37,7 @@ public class Estudiante {
     @JoinColumn(name = "id_estado")
     private EstadoEstudiante estadoEstudiante;
 
+    private boolean activo;
+
+
 }

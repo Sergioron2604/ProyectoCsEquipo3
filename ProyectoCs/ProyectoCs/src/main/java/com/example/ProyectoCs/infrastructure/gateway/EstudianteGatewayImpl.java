@@ -54,6 +54,7 @@ public class EstudianteGatewayImpl implements EstudianteGateway {
         estudiante.setContraseña(contraseñaCifrada);
         estudiante.setEstadoEstudiante(estadoEstudiante);
         estudiante.setUniversidad(universidad);
+        estudiante.setActivo(true);
         estudianteRepository.save(estudiante);
         notificationService.sendWelcomeNotification(estudianteDTO);
     }
@@ -64,9 +65,19 @@ public class EstudianteGatewayImpl implements EstudianteGateway {
         if (estudiante == null) {
             throw new IllegalStateException("El estudiante no está registrado");
         }
-        estudianteRepository.delete(estudiante);
-        String mensajeDespedida = "¡Adiós, " + estudiante.getNombre() + "! Lamentamos verte ir. ¡Esperamos verte de nuevo pronto!";
-     //   notificationService.sendNotification(estudiante.getEmail(), mensajeDespedida);
+        EstadoEstudiante estadoInactivo = estadoEstudianteRepository.findById(2L)
+                .orElseThrow(() -> new IllegalStateException("Estado de estudiante no encontrado"));
+        estudiante.setEstadoEstudiante(estadoInactivo);
+        estudiante.setActivo(false);
+        estudianteRepository.save(estudiante);
+        EstudianteDTO estudianteDTO = convertirEntidadADTO(estudiante);
+        notificationService.sendFarewellNotification(estudianteDTO);
+    }
+
+    @Override
+    public boolean estudianteExistente(String emailEstudiante) {
+        Estudiante estudiante = estudianteRepository.findByEmail(emailEstudiante);
+        return estudiante != null;
     }
 
     private boolean esContrasenaValida(String contraseña) {
@@ -99,4 +110,15 @@ public class EstudianteGatewayImpl implements EstudianteGateway {
         estudiante.setTelefono(estudianteDTO.getTelefono());
         return estudiante;
     }
+
+    private EstudianteDTO convertirEntidadADTO(Estudiante estudiante) {
+        return new EstudianteDTO(
+                estudiante.getNombre(),
+                estudiante.getEdad(),
+                estudiante.getEmail(),
+                estudiante.getTelefono()
+        );
+    }
+
+
 }

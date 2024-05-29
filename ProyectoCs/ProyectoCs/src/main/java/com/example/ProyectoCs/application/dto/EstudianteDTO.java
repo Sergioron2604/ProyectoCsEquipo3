@@ -14,4 +14,11 @@ public class EstudianteDTO {
     private String telefono;
     private int idUniversidad;
     private int idEstadoEstudiante;
+
+    public EstudianteDTO(String nombre, int edad, String email, String telefono) {
+        this.nombre = nombre;
+        this.edad = edad;
+        this.email = email;
+        this.telefono = telefono;
+    }
 }
